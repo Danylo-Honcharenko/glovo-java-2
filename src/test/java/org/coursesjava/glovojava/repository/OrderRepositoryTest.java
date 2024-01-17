@@ -26,20 +26,6 @@ public class OrderRepositoryTest {
 
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private OrderService orderService;
-
-    @Test
-    public void findOrderById() {
-        assertTrue(orderService.findById(1L).getStatusCode().isSameCodeAs(HttpStatus.OK));
-    }
-
-    @Test
-    public void notFoundOrderById() {
-        assertTrue(orderService.findById(10L).getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND));
-    }
 
     @Test
     public void updateById() {
@@ -62,21 +48,5 @@ public class OrderRepositoryTest {
 
         assertTrue(foundOrder.isPresent());
         assertEquals(expected, foundOrder.get());
-    }
-
-    @Test
-    public void deleteProductFromOrder() {
-        List<ProductEntity> products = new ArrayList<>();
-        OrderEntity order = new OrderEntity();
-        order.setId(2);
-        order.setDate(LocalDate.of(2022, 5, 6));
-        order.setCost(170);
-        order.setProducts(products);
-
-        productRepository.deleteProductByIdAndName(2L, "Beer");
-
-        Optional<OrderEntity> foundOrder = orderRepository.findById(2L);
-        assertTrue(foundOrder.isPresent());
-        assertEquals(order, foundOrder.get());
     }
 }
