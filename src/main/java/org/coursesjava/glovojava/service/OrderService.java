@@ -6,6 +6,8 @@ import org.coursesjava.glovojava.repository.OrderRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class OrderService {
@@ -24,9 +26,7 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    public ResponseEntity<OrderEntity> findById(Long id) {
-        return orderRepository.findById(id)
-                .map(o -> ResponseEntity.ok().body(o))
-                .orElse(ResponseEntity.notFound().build());
+    public Optional<OrderEntity> findById(Long id) {
+        return orderRepository.findById(id);
     }
 }

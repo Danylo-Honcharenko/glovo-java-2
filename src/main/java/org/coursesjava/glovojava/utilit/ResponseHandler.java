@@ -3,12 +3,12 @@ package org.coursesjava.glovojava.utilit;
 import org.coursesjava.glovojava.model.OrderEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class ResponseHandler {
     public static ResponseEntity<Map<String, Object>> response(String message, HttpStatus httpStatus) {
         Map<String, Object> responseStorage = new HashMap<>();
