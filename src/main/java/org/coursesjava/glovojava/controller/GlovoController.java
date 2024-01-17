@@ -3,8 +3,8 @@ package org.coursesjava.glovojava.controller;
 import lombok.RequiredArgsConstructor;
 import org.coursesjava.glovojava.model.OrderEntity;
 import org.coursesjava.glovojava.model.ProductEntity;
-import org.coursesjava.glovojava.repository.ProductRepository;
 import org.coursesjava.glovojava.service.OrderService;
+import org.coursesjava.glovojava.service.ProductService;
 import org.coursesjava.glovojava.utilit.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GlovoController {
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final OrderService orderService;
 
     @PostMapping("/create")
@@ -45,7 +45,7 @@ public class GlovoController {
         Optional<OrderEntity> order = orderService.findById(id);
         if (order.isEmpty()) return ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND);
         product.setOrder(order.get());
-        productRepository.save(product);
+        productService.save(product);
         return ResponseHandler.responseWithData("Product add successfully!", HttpStatus.OK, order.get());
     }
 
@@ -53,7 +53,7 @@ public class GlovoController {
     public ResponseEntity<Map<String, Object>> deleteProduct(@PathVariable Long id, @PathVariable String name) {
         Optional<OrderEntity> order = orderService.findById(id);
         if (order.isEmpty()) return ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND);
-        productRepository.deleteProductByIdAndName(id, name);
+        productService.deleteProductByOrderIdAndProductName(id, name);
         return ResponseHandler.responseWithData("Successfully update!", HttpStatus.OK, order.get());
     }
 
