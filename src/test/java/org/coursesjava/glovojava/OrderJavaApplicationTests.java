@@ -56,15 +56,15 @@ public class OrderJavaApplicationTests {
     @Test
     public void getById() {
         webTestClient.get()
-                .uri("/api/orders/{id}", 2)
+                .uri("/api/orders/{id}", 3)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
                 .isFound()
                 .expectBody()
-                .jsonPath("$.data.id").isEqualTo(2)
-                .jsonPath("$.data.date").isEqualTo("2022-05-06")
-                .jsonPath("$.data.cost").isEqualTo(170);
+                .jsonPath("$.data.id").isEqualTo(3)
+                .jsonPath("$.data.date").isEqualTo("2021-10-10")
+                .jsonPath("$.data.cost").isEqualTo(200);
     }
 
     @Test
@@ -92,46 +92,46 @@ public class OrderJavaApplicationTests {
                 .body(BodyInserters.fromValue(order))
                 .exchange()
                 .expectStatus()
-                .isOk()
+                .isFound()
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(1)
-                .jsonPath("$.date").isEqualTo(LocalDate.now().toString())
-                .jsonPath("$.cost").isEqualTo(150)
-                .jsonPath("$.products").isNotEmpty();
+                .jsonPath("$.data.id").isEqualTo(1)
+                .jsonPath("$.data.date").isEqualTo(LocalDate.now().toString())
+                .jsonPath("$.data.cost").isEqualTo(150)
+                .jsonPath("$.data.products").isNotEmpty();
     }
 
     @Test
     public void addProductToOrder() {
         OrderEntity order = new OrderEntity();
-        order.setId(2);
-        order.setDate(LocalDate.of(2022, 5, 6));
-        order.setCost(170);
+        order.setId(3);
+        order.setDate(LocalDate.of(2021, 10, 10));
+        order.setCost(200);
 
         ProductEntity product = new ProductEntity();
-        product.setName("Mushrooms");
-        product.setCost(120);
+        product.setName("Jem");
+        product.setCost(14);
         product.setOrder(order);
 
         webTestClient.patch()
-                .uri("/api/orders/{id}", 2)
+                .uri("/api/orders/{id}", 3)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(product))
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.data.id").isEqualTo(2)
-                .jsonPath("$.data.date").isEqualTo("2022-05-06")
-                .jsonPath("$.data.cost").isEqualTo(170)
-                .jsonPath("$.data.products[1].id").isEqualTo(5)
-                .jsonPath("$.data.products[1].name").isEqualTo("Mushrooms")
-                .jsonPath("$.data.products[1].cost").isEqualTo(120);
+                .jsonPath("$.data.id").isEqualTo(3)
+                .jsonPath("$.data.date").isEqualTo("2021-10-10")
+                .jsonPath("$.data.cost").isEqualTo(200)
+                .jsonPath("$.data.products[0].id").isEqualTo(4)
+                .jsonPath("$.data.products[0].name").isEqualTo("Jem")
+                .jsonPath("$.data.products[0].cost").isEqualTo(14);
     }
 
     @Test
     public void deleteProduct() {
         webTestClient.delete()
-                .uri("/api/orders/{id}/product/{name}", 2, "Mushrooms")
+                .uri("/api/orders/{id}/product/{name}", 1, "Apple")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
