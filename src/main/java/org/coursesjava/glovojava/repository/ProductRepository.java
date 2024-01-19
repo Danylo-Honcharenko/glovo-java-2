@@ -12,5 +12,5 @@ public interface ProductRepository extends CrudRepository<ProductEntity, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM ProductEntity p WHERE p.order.id = :id AND p.name = :name")
-    void deleteProductByIdAndName(Long id, String name);
+    void deleteProductByOrderIdAndProductName(Long id, String name);
 }
