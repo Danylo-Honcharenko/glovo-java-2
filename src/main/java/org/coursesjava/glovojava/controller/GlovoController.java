@@ -1,6 +1,8 @@
 package org.coursesjava.glovojava.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.coursesjava.glovojava.dto.OrderDto;
+import org.coursesjava.glovojava.dto.ProductDto;
 import org.coursesjava.glovojava.model.OrderEntity;
 import org.coursesjava.glovojava.model.ProductEntity;
 import org.coursesjava.glovojava.service.OrderService;
@@ -11,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 
 @RestController
@@ -23,38 +24,48 @@ public class GlovoController {
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderEntity> createOrder(@RequestBody OrderEntity order) {
-        return new ResponseEntity<>(orderService.save(order), HttpStatus.CREATED);
+    public ResponseEntity<OrderEntity> createOrder(@RequestBody OrderDto orderDto) {
+        return new ResponseEntity<>(orderService.save(OrderEntity.builder()
+                .date(orderDto.getDate())
+                .cost(orderDto.getCost())
+                .products(orderDto.getProducts())
+                .build()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
-        return orderService.findById(id).map(orderEntity -> ResponseHandler.responseWithData("Found order successfully!", HttpStatus.FOUND, orderEntity))
-                .orElseGet(() -> ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND));
+        OrderEntity order = orderService.findById(id);
+        return ResponseHandler.responseWithData("Found order successfully!", HttpStatus.FOUND, order);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable Long id, @RequestBody OrderEntity order) {
-        orderService.updateById(id, order);
-        return orderService.findById(id).map(orderEntity -> ResponseHandler.responseWithData("Found order successfully!", HttpStatus.FOUND, orderEntity))
-                .orElseGet(() -> ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND));
+    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable Long id, @RequestBody OrderDto orderDto) {
+        orderService.updateById(id, OrderEntity.builder()
+                .date(orderDto.getDate())
+                .cost(orderDto.getCost())
+                .products(orderDto.getProducts())
+                .build());
+        OrderEntity order = orderService.findById(id);
+        return ResponseHandler.responseWithData("Found order successfully!", HttpStatus.FOUND, order);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> addProductToOrder(@PathVariable Long id, @RequestBody ProductEntity product) {
-        Optional<OrderEntity> order = orderService.findById(id);
-        if (order.isEmpty()) return ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND);
-        product.setOrder(order.get());
-        productService.save(product);
-        return ResponseHandler.responseWithData("Product add successfully!", HttpStatus.OK, order.get());
+    public ResponseEntity<Map<String, Object>> addProductToOrder(@PathVariable Long id, @RequestBody ProductDto product) {
+        OrderEntity order = orderService.findById(id);
+        product.setOrder(order);
+        productService.save(ProductEntity.builder()
+                .name(product.getName())
+                .cost(product.getCost())
+                .order(product.getOrder())
+                .build());
+        return ResponseHandler.responseWithData("Product add successfully!", HttpStatus.OK, order);
     }
 
     @DeleteMapping("/{id}/product/{name}")
     public ResponseEntity<Map<String, Object>> deleteProduct(@PathVariable Long id, @PathVariable String name) {
-        Optional<OrderEntity> order = orderService.findById(id);
-        if (order.isEmpty()) return ResponseHandler.response("Order not found!", HttpStatus.NOT_FOUND);
+        OrderEntity order = orderService.findById(id);
         productService.deleteProductByOrderIdAndProductName(id, name);
-        return ResponseHandler.responseWithData("Successfully update!", HttpStatus.OK, order.get());
+        return ResponseHandler.responseWithData("Successfully update!", HttpStatus.OK, order);
     }
 
     @DeleteMapping("/{id}")
