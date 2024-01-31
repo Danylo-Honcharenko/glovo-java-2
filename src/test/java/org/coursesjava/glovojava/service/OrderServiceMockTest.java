@@ -7,7 +7,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,11 +42,10 @@ public class OrderServiceMockTest {
         expected.setCost(0);
 
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.of(expected));
-        Optional<OrderEntity> order = orderService.findById(1L);
+                .thenReturn(expected);
+        OrderEntity order = orderService.findById(1L);
 
-        assertTrue(order.isPresent());
-        assertEquals(expected, order.get());
+        assertEquals(expected, order);
     }
 
     @Test

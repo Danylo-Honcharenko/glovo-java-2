@@ -1,10 +1,9 @@
 package org.coursesjava.glovojava.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.coursesjava.glovojava.exceptions.OrderNotFoundException;
 import org.coursesjava.glovojava.model.OrderEntity;
 import org.coursesjava.glovojava.repository.OrderRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,8 +18,9 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Optional<OrderEntity> findById(Long id) {
-        return orderRepository.findById(id);
+    public OrderEntity findById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(OrderNotFoundException::new);
     }
 
     public void updateById(Long id, OrderEntity order) {

@@ -1,6 +1,7 @@
 package org.coursesjava.glovojava.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.coursesjava.glovojava.exceptions.OrderNotFoundException;
 import org.coursesjava.glovojava.model.OrderEntity;
 import org.coursesjava.glovojava.model.ProductEntity;
 import org.coursesjava.glovojava.service.OrderService;
@@ -13,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -62,7 +62,7 @@ public class GlovoControllerTest {
         order.setCost(0);
 
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.of(order));
+                .thenReturn(order);
         mockMvc.perform(get("/api/orders/{id}", 1))
                 .andExpect(status().isFound());
     }
@@ -70,7 +70,7 @@ public class GlovoControllerTest {
     @Test
     public void getByIdNotFound() throws Exception {
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.empty());
+                .thenThrow(OrderNotFoundException.class);
         mockMvc.perform(get("/api/orders/{id}", 10))
                 .andExpect(status().isNotFound());
     }
@@ -87,7 +87,7 @@ public class GlovoControllerTest {
         actual.setCost(150);
 
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.of(expected));
+                .thenReturn(expected);
         doNothing().when(orderService).updateById(anyLong(), any(OrderEntity.class));
         mockMvc.perform(put("/api/orders/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +109,7 @@ public class GlovoControllerTest {
         actual.setOrder(null);
 
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.of(expected));
+                .thenReturn(expected);
         mockMvc.perform(patch("/api/orders/{id}", 1)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(actual)))
@@ -124,7 +124,7 @@ public class GlovoControllerTest {
         expected.setCost(150);
 
         when(orderService.findById(anyLong()))
-                .thenReturn(Optional.of(expected));
+                .thenReturn(expected);
         doNothing().when(productService).deleteProductByOrderIdAndProductName(anyLong(), anyString());
         mockMvc.perform(delete("/api/orders/{id}/product/{name}", 1, "Apple"))
                 .andExpect(status().isOk());
